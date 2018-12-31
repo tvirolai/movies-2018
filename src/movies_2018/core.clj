@@ -82,24 +82,24 @@
   (for [[k v] (genre-freqs data)]
     {:genre k :quantity v}))
 
+(defn top-rating-difference [data year]
+  (->> data
+       (filter (partial seen-in? 2018))
+       (map add-rating-difference)
+       (filter #(not= nil (:rating-difference %)))
+       (sort-by :rating-difference)
+       reverse))
+
+(defn rating-correlation [data]
+  (let [d (map add-rating-difference data)]
+    (transduce identity (kixi/correlation :imdb-rating :your-rating) d)))
+
 (def bars
   {:data {:values (->> (load-data) (filter (partial seen-in? 2018)) genre-freq-map)}
    :encoding {:x {:field "genre" :type "ordinal"}
               :y {:field "quantity" :type "quantitative"}
               :color {:field "genre" :type "nominal" :legend nil}}
    :mark "bar"})
-
-(defn play-data [& names]
-  (for [n names
-        i (range 20)]
-    {:time i :item n :quantity (+ (Math/pow (* i (count n)) 0.8) (rand-int (count n)))}))
-
-(def line-plot
-  {:data {:values (play-data "monkey" "slipper" "broom")}
-   :encoding {:x {:field "time"}
-              :y {:field "quantity"}
-              :color {:field "item" :type "nominal"}}
-   :mark "line"})
 
 (defonce start
   (oz/start-plot-server!))
