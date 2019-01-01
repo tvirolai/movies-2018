@@ -12,6 +12,8 @@
 
 (defn lenghts-per-year [data]
   {:data {:values (stats/films-by-month data)}
+   :width 500
+   :height 400
    :encoding {:x {:field "month"}
               :y {:field "quantity"}
               :color {:field "year" :type "nominal"}}
