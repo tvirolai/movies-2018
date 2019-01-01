@@ -15,7 +15,12 @@
      :days (/ hours 24.0)}))
 
 (defn length-counts-in [year data]
-  (transduce (comp (filter (partial seen-in? 2018)) (map :runtime)) + data))
+  (transduce (comp (filter (partial seen-in? year)) (map :runtime)) + data))
+
+(defn lengths-by-year [data]
+  (for [year (range 2012 2019)]
+    {:year year
+     :lengths (length-counts-in year data)}))
 
 (defn genre-freqs [data]
   (->> data
@@ -53,3 +58,10 @@
 
 (defn rating-correlation [data]
   (transduce identity (kixi/correlation :imdb-rating :your-rating) data))
+
+(defn films-by-month [data]
+  (mapcat (fn [year]
+            (->> (month-counts data year)
+                 (map #(assoc % :year year))))
+          (range 2013 2019)))
+
